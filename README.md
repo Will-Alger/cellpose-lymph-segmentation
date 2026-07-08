@@ -219,6 +219,14 @@ normalization + seam double-counting), not a fix. The `model1→model4` ladder s
 real, measured progress *within* the tiling approach (seam stitching alone nearly
 tripled clean-image accuracy), but simply running CellposeSAM once wins outright.
 
+**Why not tile manually?** The custom split was motivated by CellposeSAM's network
+only accepting 256×256 blocks. But `model.eval` already splits any-size image into
+256 tiles *internally* and stitches the **flow field before labeling cells**, so a
+nucleus crossing a tile boundary stays one cell. Manual splitting instead stitches
+*after* labeling (→ double-counts) and re-normalizes each tile (→ contrast drift) —
+which is exactly the error `whole_image` avoids. Mechanism + code refs in
+[`CHANGES.md`](CHANGES.md#why-not-manual-tiling-the-256256-question).
+
 Reproduce with `python progression.py` (regenerates the chart above into
 `output/`). Validated on one image family with synthetic degradation — re-run on
 the real image when available. Full change log and rationale in `CHANGES.md`.
