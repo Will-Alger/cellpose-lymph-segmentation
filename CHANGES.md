@@ -76,6 +76,42 @@ smoothing away faint nuclei). Answers Phase-1 item #6.
 tiling if the real image is too large for GPU memory — and if so, use model2/3's
 IoU seam-stitching, never the original center-crop-offset scheme.
 
+## Why not manual tiling? (the 256×256 question)
+
+The original approach was motivated by a real observation: the CellposeSAM
+**network** can only ingest **256×256** blocks (`bsize=256` is hardcoded for cpsam
+and any other value is rejected — `models.py:228`). The conclusion drawn was "so I
+must split the image myself." That conclusion is the mistake.
+
+**Cellpose already splits any-size image into 256 tiles internally — and stitches
+in the right place.** In `core.py:run_net`:
+- it computes how many 256 tiles the image needs, with overlap (`core.py:204-205`);
+- runs the network on each tile (`make_tiles` → forward, `core.py:221-230`);
+- **blends the tile outputs back into a full-size flow/probability field**
+  (`average_tiles`, `core.py:248`);
+- and only *then* (`models.py:317`) computes cell masks **once, on the whole
+  stitched field**.
+
+The 256 limit is on the network's receptive window, **not** on the image you pass.
+The decisive difference from manual tiling is *where* the stitching happens:
+
+| | Cellpose internal tiling | Manual split (original) |
+|---|---|---|
+| Stitches at the | **flow/probability level** (before labeling) | **label level** (after each tile is segmented) |
+| Cell crossing a tile boundary | stays **one** cell | becomes **two** labels → double-counted |
+| Normalization | **global**, once, before tiling | **per-tile**, each block independently |
+
+Because cellpose blends the flow field *before* assigning instance labels, a
+nucleus straddling a 256-boundary is labeled once, as a whole cell. Manual tiling
+labels each tile separately and then can only merge labels *after the fact* — which
+is the seam double-counting (baseline 314 vs 225 GT) — and re-normalizes every
+tile — the per-tile contrast problem. This is the mechanism behind `whole_image`
+winning: not a coincidence, but a direct consequence of stitching flows vs. labels.
+
+**In one line:** the 256×256 is only the network's block size; `model.eval` on the
+full image already tiles internally and stitches flows before labeling, so cells
+crossing boundaries stay whole — which a post-hoc label merge cannot guarantee.
+
 ## Phase 1 — Planned improvements (NOT YET APPLIED)
 
 Each will be applied as a separate, documented change once the faithful run works
