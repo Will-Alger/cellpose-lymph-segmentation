@@ -8,6 +8,33 @@ documented, measured changes. Everything runs with the project venv.
 **Prerequisites:** Python 3.10 or 3.11, and git. An NVIDIA GPU is optional (it's
 much faster, but everything runs on CPU / Apple Silicon too).
 
+<details>
+<summary><b>Don't have Python 3.11? Install it (click to expand)</b></summary>
+
+**Windows** — via winget (built into Windows 10/11):
+```powershell
+winget install Python.Python.3.11
+```
+Or download the installer from [python.org/downloads](https://www.python.org/downloads/release/python-3119/)
+and **check "Add python.exe to PATH"** during setup.
+Verify: `py -3.11 --version`
+
+**macOS** — via [Homebrew](https://brew.sh):
+```bash
+brew install python@3.11
+```
+Or download the macOS installer from [python.org](https://www.python.org/downloads/release/python-3119/).
+Verify: `python3.11 --version`
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt update
+sudo apt install python3.11 python3.11-venv
+```
+Verify: `python3.11 --version`
+
+</details>
+
 ```bash
 git clone <your-repo-url>
 cd project
