@@ -78,7 +78,9 @@ def main():
 
     from cellpose import models
     model = models.CellposeModel(gpu=not args.no_gpu)
-    print(f"Model loaded (gpu={not args.no_gpu}). Running method: {args.method}")
+    # Report the device cellpose actually chose (it falls back to CPU when no
+    # CUDA/MPS GPU is available, e.g. on Intel Macs), not just the requested flag.
+    print(f"Model loaded on {model.device}. Running method: {args.method}")
 
     full_mask = M.METHODS[args.method](dapi, model)
     total_cells = len(np.unique(full_mask)) - 1
