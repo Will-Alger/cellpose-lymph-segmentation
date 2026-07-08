@@ -58,12 +58,20 @@ source .venv/bin/activate
 # NVIDIA GPU on Windows/Linux — incl. RTX 50-series (Blackwell):
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
 
-# macOS (Apple Silicon or Intel) — uses MPS/CPU automatically:
+# macOS Apple Silicon — uses MPS/CPU automatically:
 pip install torch torchvision
 
 # No GPU (Windows/Linux CPU-only):
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 ```
+
+> **Intel Mac (x86-64):** best-effort only — CPU-only and slow. PyTorch ships no
+> wheels newer than **2.2.2** for Intel Macs, and that build needs **NumPy 1.x**,
+> so install this exact combo instead of the line above:
+> ```bash
+> pip install "torch<=2.2.2" torchvision "numpy<2"
+> ```
+> Apple Silicon / Windows / Linux are the recommended targets.
 
 **3. Install the rest of the dependencies**
 ```bash
@@ -86,6 +94,14 @@ If that prints a cell count and writes files into `output/`, you're set.
 > `.venv\Scripts\python.exe …` on Windows, `.venv/bin/python …` on macOS/Linux.
 > The examples below use plain `python` and forward-slash paths; on Windows use
 > backslashes.
+
+### Troubleshooting
+
+- **`A module compiled using NumPy 1.x cannot be run in NumPy 2.x … Downgrade to
+  numpy<2`** — you're on an **Intel Mac**, where torch (≤2.2.2) was built against
+  NumPy 1.x. Fix: `pip install "numpy<2"`. Do this **after** `pip install -r
+  requirements.txt` so nothing bumps NumPy back to 2.x. (Only Intel Macs need this
+  pin.)
 
 ## The approaches — `methods/`
 
