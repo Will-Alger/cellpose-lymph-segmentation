@@ -1,0 +1,21 @@
+# Python environment
+.venv/
+__pycache__/
+*.pyc
+
+# Vendored CellposeSAM source (install from PyPI instead; see README)
+cellpose/
+
+# Generated outputs and test data (regenerate with the scripts)
+output/
+lowq/
+testdata/
+*.npy
+synthetic_dapi.tif
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Local provenance, not for the public repo
+prompt.md

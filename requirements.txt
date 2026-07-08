@@ -1,0 +1,10 @@
+# Install PyTorch FIRST (platform-specific — see README "Quick start"), then:
+#     pip install -r requirements.txt
+#
+# Developed against cellpose 4.2.1 (the CellposeSAM / cpsam line) + torch 2.11 cu128.
+
+cellpose>=4.2
+scikit-image>=0.24
+matplotlib>=3.8
+tifffile>=2024.1
+PyWavelets>=1.6
