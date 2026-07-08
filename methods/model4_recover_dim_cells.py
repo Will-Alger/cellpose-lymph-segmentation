@@ -11,6 +11,7 @@ Diff this file against model3_robust_background.py: `cellprob_threshold` changes
 """
 
 import numpy as np
+from tqdm import tqdm
 
 
 def run(img, model):
@@ -30,7 +31,7 @@ def run(img, model):
         for x in range(0, w, step):
             tiles.append((y, x, min(y + tile_size, h), min(x + tile_size, w)))
 
-    for (y1, x1, y2, x2) in tiles:
+    for (y1, x1, y2, x2) in tqdm(tiles, desc="model4 tiles"):
         patch = img[y1:y2, x1:x2]
 
         if patch.max() < bg_cut:
