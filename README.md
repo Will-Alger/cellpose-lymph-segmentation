@@ -219,6 +219,20 @@ normalization + seam double-counting), not a fix. The `model1→model4` ladder s
 real, measured progress *within* the tiling approach (seam stitching alone nearly
 tripled clean-image accuracy), but simply running CellposeSAM once wins outright.
 
+### Cells detected by each model
+
+The same moderate-quality image segmented by every method (red = detected cell
+outlines, vs. ground truth top-left):
+
+![Cells detected by each model on the moderate-quality image](assets/cells_detected_moderate.png)
+
+What to look for: `baseline`/`model1` show **seam artifacts** — straight segments
+slicing nuclei where tiles meet, plus split duplicates (198 cells but many wrong).
+Adding stitching (`model2`/`model3`) removes those. `model4` recovers more faint
+cells (210). `whole_image` gives the cleanest outlines with the fewest false
+positives (152 cells, but the highest AP — the ones it finds are *right*).
+`denoise` is the most conservative, missing many faint nuclei (105).
+
 **Why not tile manually?** The custom split was motivated by CellposeSAM's network
 only accepting 256×256 blocks. But `model.eval` already splits any-size image into
 256 tiles *internally* and stitches the **flow field before labeling cells**, so a

@@ -84,13 +84,14 @@ def main():
         row += f" {r['secs']:7.1f}"
         print(row)
 
-    # ---- side-by-side overlays ----
+    # ---- overlays, laid out in a grid ----
     panels = ([("ground truth", gt)] if gt is not None else []) + \
              [(r['name'], r['mask']) for r in results]
     n = len(panels)
-    fig, axes = plt.subplots(1, n, figsize=(5.2 * n, 5.4))
-    if n == 1:
-        axes = [axes]
+    ncols = min(4, n)
+    nrows = int(np.ceil(n / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(5.2 * ncols, 5.4 * nrows))
+    axes = np.atleast_1d(axes).ravel()
     for ax, (title, mask) in zip(axes, panels):
         ax.imshow(img, cmap="gray")
         for o in utils.outlines_list(mask):
@@ -102,6 +103,8 @@ def main():
             if r['sc']:
                 sub = f"  AP@.5={r['sc']['ap50']:.3f}"
         ax.set_title(f"{title} · {cells} cells{sub}", fontsize=12)
+        ax.axis("off")
+    for ax in axes[n:]:            # hide any unused grid cells
         ax.axis("off")
     base = os.path.splitext(os.path.basename(args.image))[0]
     os.makedirs("output", exist_ok=True)
